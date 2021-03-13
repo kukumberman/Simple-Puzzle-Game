@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PuzzleClicker : MonoBehaviour
 {
+    [SerializeField] private bool avoidCorrect = false;
+
     private KeyCode[] keys = new KeyCode[] { KeyCode.Mouse0, KeyCode.Space };
 
     private Camera cam = null;
@@ -38,13 +40,15 @@ public class PuzzleClicker : MonoBehaviour
         {
             if (hit.collider.TryGetComponent(out PuzzleElement puzzle))
             {
-                if (puzzle.IsCorrectPosition())
+                if (avoidCorrect)
                 {
-                    Deselect();
+                    if (puzzle.IsCorrectPosition())
+                    {
+                        Deselect();
 
-                    return;
+                        return;
+                    }
                 }
-
 
                 if (selectedPuzzle)
                 {

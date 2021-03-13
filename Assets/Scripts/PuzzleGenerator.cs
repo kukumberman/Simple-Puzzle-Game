@@ -83,17 +83,39 @@ public class PuzzleGenerator : MonoBehaviour
 
     public bool ValidatePuzzles()
     {
+        bool isEnd = true;
+
         for (int i = 0; i < puzzles.Length; i++)
         {
             var p = puzzles[i];
 
             if (!p.IsCorrectPosition())
             {
-                return false;
+                isEnd = false;
+                break;
             }
         }
 
-        return true;
+        if (isEnd)
+        {
+            DisableOutline();
+        }
+
+        return isEnd;
+    }
+
+    private void DisableOutline()
+    {
+        // todo: outline is not disable because of shader
+
+        Debug.Log("is end");
+
+        for (int i = 0; i < puzzles.Length; i++)
+        {
+            var p = puzzles[i];
+
+            p.DisableOutline();
+        }
     }
 
     public Vector3 GetPosition(Vector2Int grid)

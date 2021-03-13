@@ -8,8 +8,11 @@ public class PuzzleElement : MonoBehaviour
     [SerializeField] private MeshFilter meshFilter = null;
     [SerializeField] private MeshRenderer meshRenderer = null;
 
-    [Header("Properties")]
-    [SerializeField] private string outlinePropertyName = "_UseGradient";
+    private string gradientPropertyName = "_UseGradient";
+    private string outlinePropertyName = "_UseOutline";
+
+    private int gradientPropertyId = 0;
+    private int outlinePropertyId = 0;
 
     private Vector2Int gridCurrent = Vector2Int.zero;
     private Vector2Int gridTarget = Vector2Int.zero;
@@ -21,11 +24,15 @@ public class PuzzleElement : MonoBehaviour
     private PuzzleGenerator puzzleGenerator = null;
     private BackgroundElement bg = null;
 
-    private int propertyId = 0;
-
     private Vector2Int smoothGridTarget = Vector2Int.zero;
     private Vector3 smoothTarget = Vector3.zero;
     private Vector3 smoothCurrent = Vector3.zero;
+
+    private void Awake()
+    {
+        gradientPropertyId = Shader.PropertyToID(gradientPropertyName);
+        outlinePropertyId = Shader.PropertyToID(outlinePropertyName);
+    }
 
     private void OnDrawGizmos()
     {
@@ -43,22 +50,21 @@ public class PuzzleElement : MonoBehaviour
 
     public void Outline(bool active)
     {
-        //if (IsCorrectPosition()) return;
-
         MaterialPropertyBlock mpb = new MaterialPropertyBlock();
-
         meshRenderer.GetPropertyBlock(mpb);
 
         int value = active ? 1 : 0;
-
-        mpb.SetInt(propertyId, value);
-
+        mpb.SetInt(gradientPropertyId, value);
         meshRenderer.SetPropertyBlock(mpb);
     }
 
     public void DisableOutline()
     {
-        // to do: remove white outline
+        MaterialPropertyBlock mpb = new MaterialPropertyBlock();
+        meshRenderer.GetPropertyBlock(mpb);
+
+        mpb.SetInt(outlinePropertyId, 0);
+        meshRenderer.SetPropertyBlock(mpb);
     }
 
     public bool IsCorrectPosition()
@@ -76,13 +82,14 @@ public class PuzzleElement : MonoBehaviour
         gridCurrent = grid;
 
         transform.position = puzzleGenerator.GetPosition(gridCurrent);
+
+        // to do: works fine, but moveable elements should be in front of disabled
+        //if (IsCorrectPosition()) DisableOutline();
     }
 
     public void SetCorrectPosition()
     {
-        gridCurrent = gridTarget;
-
-        transform.position = puzzleGenerator.GetPosition(gridCurrent);
+        SetPosition(gridTarget);
     }
 
     //
@@ -101,8 +108,6 @@ public class PuzzleElement : MonoBehaviour
 
     public void LerpTowards(float percentage01)
     {
-        //Vector3 a = puzzleGenerator.GetPosition(gridCurrent);
-
         Vector3 pos = Vector3.Lerp(smoothCurrent, smoothTarget, percentage01);
 
         transform.position = pos;
@@ -116,15 +121,9 @@ public class PuzzleElement : MonoBehaviour
 
         // positions
 
-        transform.position = puzzleGenerator.GetPosition(gridCurrentPosition);
-
-        gridCurrent = gridCurrentPosition;
         gridTarget = gridTargetPosition;
 
-        if (IsCorrectPosition())
-        {
-            DisableOutline();
-        }
+        SetPosition(gridCurrentPosition);
 
         // mesh
 
@@ -143,8 +142,6 @@ public class PuzzleElement : MonoBehaviour
         }
 
         GenerateMesh();
-
-        propertyId = Shader.PropertyToID(outlinePropertyName);
     }
 
     private void GenerateMesh()

@@ -9,6 +9,7 @@
     Properties
     {
 		[HideInInspector] _MainTex ("Texture", 2D) = "white" {}
+		[Toggle] _UseOutline ("Use Outline", Int) = 0
 		[Toggle] _UseGradient ("Use Gradient", Int) = 0
 		_Speed ("Speed", Int) = 2
 		_Alpha ("Alpha", Range(0, 1)) = 1
@@ -48,12 +49,14 @@
             sampler2D _MainTex;
             float4 _MainTex_ST;
 
+			int _UseOutline;
 			int _UseGradient;
+
 			int _Speed;
 			float _Alpha;
 			float _Thickness;
 
-			float4 _Points[1];
+			//float4 _Points[1];
 
 			fixed4 drawGrid(float2 uv)
 			{
@@ -110,6 +113,16 @@
 
 				// texture + outline
 				fixed4 color = tex + outline;
+
+				// to do: minor fix
+				/*if (_UseOutline > 0)
+				{
+					return color;
+				}
+				else
+				{
+					return tex;
+				}*/
 
 				if (_UseGradient > 0)
 				{

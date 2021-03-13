@@ -49,8 +49,6 @@ public class PuzzleMover : MonoBehaviour
                 {
                     var p = movingPuzzles[i];
                     p.SetTarget();
-
-                    if (p.IsCorrectPosition()) p.DisableOutline();
                 }
 
                 if (puzzleGenerator.ValidatePuzzles())
