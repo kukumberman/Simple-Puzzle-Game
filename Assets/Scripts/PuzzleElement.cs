@@ -11,15 +11,18 @@ public class PuzzleElement : MonoBehaviour
     [Header("Properties")]
     [SerializeField] private string outlinePropertyName = "_UseGradient";
 
-    private Vector3 randomPosition = Vector3.zero;
+    private Vector2Int randomPosition = Vector2Int.zero;
 
     private float rectSize = 0;
 
     private List<Vector3> vertices = new List<Vector3>();
 
+    private PuzzleGenerator puzzleGenerator = null;
     private BackgroundElement bg = null;
 
     private int propertyId = 0;
+
+    public Vector2Int GridPosition { get; private set; } = Vector2Int.zero;
 
     private void OnDrawGizmos()
     {
@@ -53,9 +56,13 @@ public class PuzzleElement : MonoBehaviour
         meshRenderer.SetPropertyBlock(mpb);
     }
 
-    public void Init(Vector3 position, Vector3 randomPos, float size, BackgroundElement background)
+    public void Init(PuzzleGenerator generator, Vector2Int gridPosition, Vector2Int randomPos, float size, BackgroundElement background)
     {
-        transform.position = position;
+        puzzleGenerator = generator;
+
+        GridPosition = gridPosition;
+
+        transform.position = puzzleGenerator.GetPosition(gridPosition);
 
         randomPosition = randomPos;
 
@@ -73,31 +80,19 @@ public class PuzzleElement : MonoBehaviour
             }
         }
 
+        GenerateMesh();
+
+        propertyId = Shader.PropertyToID(outlinePropertyName);
+    }
+
+    private void GenerateMesh()
+    {
         Mesh mesh = new Mesh();
 
         mesh.SetVertices(vertices);
 
+        // 0, 3, 1, 3, 0, 2 = default triangles in quad
         mesh.triangles = new int[] { 0, 2, 1, 1, 2, 3 };
-        //mesh.triangles = new int[] { 0, 3, 1, 3, 0, 2 }; // default triangles in quad
-
-        List<Vector2[]> uvs = new List<Vector2[]>
-        {
-            new Vector2[]
-            {
-                Vector2.zero,
-                new Vector2(1, 0),
-                new Vector2(0, 1),
-                Vector2.one
-            },
-            new Vector2[]
-            {
-                Vector2.zero,
-                new Vector2(0, 1),
-                new Vector2(1, 0),
-                Vector2.one
-            }
-        };
-        //mesh.uv = uvs[Random.Range(0, uvs.Count)];
 
         var uv = GetUV();
 
@@ -107,8 +102,6 @@ public class PuzzleElement : MonoBehaviour
         mesh.SetUVs(1, GetDefaultUV());
 
         meshFilter.mesh = mesh;
-
-        propertyId = Shader.PropertyToID(outlinePropertyName);
     }
 
     private Vector3 GetPosition(int x, int y)
@@ -130,7 +123,7 @@ public class PuzzleElement : MonoBehaviour
 
         Vector2[] corners = bg.GetCorners();
 
-        Vector3 self = randomPosition;
+        Vector3 self = puzzleGenerator.GetPosition(randomPosition);
 
         float minX = Mathf.InverseLerp(corners[0].x, corners[1].x, vertices[0].x + self.x);
         float maxX = Mathf.InverseLerp(corners[0].x, corners[1].x, vertices[1].x + self.x);

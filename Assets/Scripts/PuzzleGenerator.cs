@@ -15,29 +15,29 @@ public class PuzzleGenerator : MonoBehaviour
     {
         bg = FindObjectOfType<BackgroundElement>();
 
-        List<Vector3> positions = new List<Vector3>();
+        List<Vector2Int> positions = new List<Vector2Int>();
 
         for (int y = 0; y < gridSize.y; y++)
         {
             for (int x = 0; x < gridSize.x; x++)
             {
-                Vector3 pos = GetPosition(x, y) + transform.position;
-                positions.Add(pos);
+                //Vector3 pos = GetPosition(x, y);
+                positions.Add(new Vector2Int(x, y));
             }
         }
 
-        Queue<Vector3> queue = new Queue<Vector3>(positions);
+        Queue<Vector2Int> queue = new Queue<Vector2Int>(positions);
 
         for (int i = 0, length = gridSize.x * gridSize.y; i < length; i++)
         {
             int randomIndex = Random.Range(0, positions.Count);
-            Vector3 randomPosition = positions[randomIndex];
+            Vector2Int randomPosition = positions[randomIndex];
             positions.RemoveAt(randomIndex);
 
-            Vector3 pos = queue.Dequeue();
+            Vector2Int gridPosition = queue.Dequeue();
 
             var puzzle = Instantiate(puzzleElementPrefab, transform);
-            puzzle.Init(pos, randomPosition, chunkSize, bg);
+            puzzle.Init(this, gridPosition, randomPosition, chunkSize, bg);
         }
     }
 
@@ -49,11 +49,16 @@ public class PuzzleGenerator : MonoBehaviour
         {
             for (int x = 0; x < gridSize.x; x++)
             {
-                Vector3 pos = GetPosition(x, y) + transform.position;
+                Vector3 pos = GetPosition(x, y);
 
                 Gizmos.DrawWireCube(pos, size);
             }
         }
+    }
+
+    public Vector3 GetPosition(Vector2Int grid)
+    {
+        return GetPosition(grid.x, grid.y);
     }
 
     private Vector3 GetPosition(int x, int y)
@@ -68,6 +73,6 @@ public class PuzzleGenerator : MonoBehaviour
 
         Vector3 position = pos * chunkSize + pos * spacing;
 
-        return position;
+        return position + transform.position;
     }
 }
