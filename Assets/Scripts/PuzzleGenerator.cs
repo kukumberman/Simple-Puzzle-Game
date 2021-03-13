@@ -63,6 +63,24 @@ public class PuzzleGenerator : MonoBehaviour
         }
     }
 
+    public void Finish()
+    {
+        for (int i = 0; i < puzzles.Length; i++)
+        {
+            var p = puzzles[i];
+
+            if (!p.IsCorrectPosition())
+            {
+                p.SetCorrectPosition();
+            }
+        }
+
+        if (ValidatePuzzles())
+        {
+            Debug.Log("ended by single click");
+        }
+    }
+
     public bool ValidatePuzzles()
     {
         for (int i = 0; i < puzzles.Length; i++)

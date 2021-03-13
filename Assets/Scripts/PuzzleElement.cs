@@ -23,6 +23,10 @@ public class PuzzleElement : MonoBehaviour
 
     private int propertyId = 0;
 
+    private Vector2Int smoothGridTarget = Vector2Int.zero;
+    private Vector3 smoothTarget = Vector3.zero;
+    private Vector3 smoothCurrent = Vector3.zero;
+
     private void OnDrawGizmos()
     {
         Color a = Color.blue;
@@ -64,8 +68,40 @@ public class PuzzleElement : MonoBehaviour
     {
         gridCurrent = grid;
 
-        transform.position = puzzleGenerator.GetPosition(grid);
+        transform.position = puzzleGenerator.GetPosition(gridCurrent);
     }
+
+    public void SetCorrectPosition()
+    {
+        gridCurrent = gridTarget;
+
+        transform.position = puzzleGenerator.GetPosition(gridCurrent);
+    }
+
+    //
+
+    public void SetSmoothTarget(Vector2Int target)
+    {
+        smoothGridTarget = target;
+        smoothTarget = puzzleGenerator.GetPosition(target);
+        smoothCurrent = puzzleGenerator.GetPosition(gridCurrent);
+    }
+
+    public void SetTarget()
+    {
+        SetPosition(smoothGridTarget);
+    }
+
+    public void LerpTowards(float percentage01)
+    {
+        //Vector3 a = puzzleGenerator.GetPosition(gridCurrent);
+
+        Vector3 pos = Vector3.Lerp(smoothCurrent, smoothTarget, percentage01);
+
+        transform.position = pos;
+    }
+
+    //
 
     public void Init(PuzzleGenerator generator, Vector2Int gridCurrentPosition, Vector2Int gridTargetPosition, float size, BackgroundElement background)
     {
