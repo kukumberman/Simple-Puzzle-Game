@@ -83,7 +83,8 @@ public class PuzzleElement : MonoBehaviour
 
         //Debug.Log(string.Join(" ", uv));
 
-        mesh.uv = uv;
+        mesh.SetUVs(0, uv);
+        mesh.SetUVs(1, GetDefaultUV());
 
         meshFilter.mesh = mesh;
     }
@@ -105,14 +106,6 @@ public class PuzzleElement : MonoBehaviour
     {
         Vector2[] uv = new Vector2[4];
 
-        Vector2[] defaultUV = new Vector2[]
-        {
-            Vector2.zero,
-            new Vector2(1, 0),
-            new Vector2(0, 1),
-            Vector2.one
-        };
-
         Vector2[] corners = bg.GetCorners();
 
         Vector3 self = randomPosition;
@@ -129,5 +122,18 @@ public class PuzzleElement : MonoBehaviour
         uv[3] = new Vector2(maxX, maxY);
 
         return uv;
+    }
+    
+    private Vector2[] GetDefaultUV()
+    {
+        Vector2[] defaultUV = new Vector2[]
+        {
+            Vector2.zero,
+            new Vector2(1, 0),
+            new Vector2(0, 1),
+            Vector2.one
+        };
+
+        return defaultUV;
     }
 }
