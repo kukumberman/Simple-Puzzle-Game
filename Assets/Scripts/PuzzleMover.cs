@@ -7,6 +7,7 @@ public class PuzzleMover : MonoBehaviour
     [SerializeField] private bool isImmediately = true;
     [SerializeField] private float duration = 1;
     [SerializeField] private AnimationCurve animationCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+    [SerializeField] private AnimationCurve scaleCurve = null;
 
     private bool isMoving = false;
     private float percentage01 = 0;
@@ -36,11 +37,14 @@ public class PuzzleMover : MonoBehaviour
             percentage01 += 1f / duration * Time.deltaTime;
 
             float smoothPercent01 = animationCurve.Evaluate(percentage01);
+            float scaleValue = scaleCurve.Evaluate(percentage01);
 
             for (int i = 0; i < movingPuzzles.Count; i++)
             {
                 var p = movingPuzzles[i];
                 p.LerpTowards(smoothPercent01);
+
+                p.transform.localScale = Vector2.one * scaleValue;
             }
 
             if (percentage01 >= 1)
