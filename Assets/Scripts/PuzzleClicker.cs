@@ -10,9 +10,13 @@ public class PuzzleClicker : MonoBehaviour
 
     private PuzzleElement selectedPuzzle = null;
 
+    private PuzzleGenerator puzzleGenerator = null;
+
     private void Start()
     {
         cam = Camera.main;
+
+        puzzleGenerator = FindObjectOfType<PuzzleGenerator>();
     }
 
     private void Update()
@@ -38,9 +42,16 @@ public class PuzzleClicker : MonoBehaviour
                 {
                     if (selectedPuzzle != puzzle)
                     {
-                        var pos = selectedPuzzle.transform.position;
-                        selectedPuzzle.transform.position = puzzle.transform.position;
-                        puzzle.transform.position = pos;
+                        var a = selectedPuzzle.GetPosition();
+                        var b = puzzle.GetPosition();
+
+                        selectedPuzzle.SetPosition(b);
+                        puzzle.SetPosition(a);
+
+                        if (puzzleGenerator.ValidatePuzzles())
+                        {
+                            Debug.Log("Success!");
+                        }
                     }
                     else
                     {

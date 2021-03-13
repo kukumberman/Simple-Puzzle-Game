@@ -11,7 +11,8 @@ public class PuzzleElement : MonoBehaviour
     [Header("Properties")]
     [SerializeField] private string outlinePropertyName = "_UseGradient";
 
-    private Vector2Int randomPosition = Vector2Int.zero;
+    private Vector2Int gridCurrent = Vector2Int.zero;
+    private Vector2Int gridTarget = Vector2Int.zero;
 
     private float rectSize = 0;
 
@@ -21,8 +22,6 @@ public class PuzzleElement : MonoBehaviour
     private BackgroundElement bg = null;
 
     private int propertyId = 0;
-
-    public Vector2Int GridPosition { get; private set; } = Vector2Int.zero;
 
     private void OnDrawGizmos()
     {
@@ -38,11 +37,6 @@ public class PuzzleElement : MonoBehaviour
         }
     }
 
-    //private void Update()
-    //{
-    //    meshFilter.mesh.uv = GetUV();
-    //}
-
     public void Outline(bool active)
     {
         MaterialPropertyBlock mpb = new MaterialPropertyBlock();
@@ -56,15 +50,35 @@ public class PuzzleElement : MonoBehaviour
         meshRenderer.SetPropertyBlock(mpb);
     }
 
-    public void Init(PuzzleGenerator generator, Vector2Int gridPosition, Vector2Int randomPos, float size, BackgroundElement background)
+    public bool IsCorrectPosition()
+    {
+        return gridCurrent == gridTarget;
+    }
+
+    public Vector2Int GetPosition()
+    {
+        return gridCurrent;
+    }
+
+    public void SetPosition(Vector2Int grid)
+    {
+        gridCurrent = grid;
+
+        transform.position = puzzleGenerator.GetPosition(grid);
+    }
+
+    public void Init(PuzzleGenerator generator, Vector2Int gridCurrentPosition, Vector2Int gridTargetPosition, float size, BackgroundElement background)
     {
         puzzleGenerator = generator;
 
-        GridPosition = gridPosition;
+        // positions
 
-        transform.position = puzzleGenerator.GetPosition(gridPosition);
+        transform.position = puzzleGenerator.GetPosition(gridCurrentPosition);
 
-        randomPosition = randomPos;
+        gridCurrent = gridCurrentPosition;
+        gridTarget = gridTargetPosition;
+
+        // mesh
 
         rectSize = size;
         bg = background;
@@ -123,7 +137,7 @@ public class PuzzleElement : MonoBehaviour
 
         Vector2[] corners = bg.GetCorners();
 
-        Vector3 self = puzzleGenerator.GetPosition(randomPosition);
+        Vector3 self = puzzleGenerator.GetPosition(gridTarget);
 
         float minX = Mathf.InverseLerp(corners[0].x, corners[1].x, vertices[0].x + self.x);
         float maxX = Mathf.InverseLerp(corners[0].x, corners[1].x, vertices[1].x + self.x);

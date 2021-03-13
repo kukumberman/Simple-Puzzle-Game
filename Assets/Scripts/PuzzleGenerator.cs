@@ -9,6 +9,8 @@ public class PuzzleGenerator : MonoBehaviour
     [SerializeField] private float spacing = 1;
     [SerializeField] private PuzzleElement puzzleElementPrefab = null;
 
+    private PuzzleElement[] puzzles = null;
+
     private BackgroundElement bg = null;
 
     private void Start()
@@ -21,14 +23,17 @@ public class PuzzleGenerator : MonoBehaviour
         {
             for (int x = 0; x < gridSize.x; x++)
             {
-                //Vector3 pos = GetPosition(x, y);
                 positions.Add(new Vector2Int(x, y));
             }
         }
 
         Queue<Vector2Int> queue = new Queue<Vector2Int>(positions);
 
-        for (int i = 0, length = gridSize.x * gridSize.y; i < length; i++)
+        int count = gridSize.x * gridSize.y;
+
+        puzzles = new PuzzleElement[count];
+
+        for (int i = 0; i < count; i++)
         {
             int randomIndex = Random.Range(0, positions.Count);
             Vector2Int randomPosition = positions[randomIndex];
@@ -38,6 +43,8 @@ public class PuzzleGenerator : MonoBehaviour
 
             var puzzle = Instantiate(puzzleElementPrefab, transform);
             puzzle.Init(this, gridPosition, randomPosition, chunkSize, bg);
+
+            puzzles[i] = puzzle;
         }
     }
 
@@ -54,6 +61,21 @@ public class PuzzleGenerator : MonoBehaviour
                 Gizmos.DrawWireCube(pos, size);
             }
         }
+    }
+
+    public bool ValidatePuzzles()
+    {
+        for (int i = 0; i < puzzles.Length; i++)
+        {
+            var p = puzzles[i];
+
+            if (!p.IsCorrectPosition())
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public Vector3 GetPosition(Vector2Int grid)
