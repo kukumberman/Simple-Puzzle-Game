@@ -4,7 +4,12 @@ using UnityEngine;
 
 public class PuzzleElement : MonoBehaviour
 {
+    [Header("Components")]
     [SerializeField] private MeshFilter meshFilter = null;
+    [SerializeField] private MeshRenderer meshRenderer = null;
+
+    [Header("Properties")]
+    [SerializeField] private string outlinePropertyName = "_UseGradient";
 
     private Vector3 randomPosition = Vector3.zero;
 
@@ -13,6 +18,8 @@ public class PuzzleElement : MonoBehaviour
     private List<Vector3> vertices = new List<Vector3>();
 
     private BackgroundElement bg = null;
+
+    private int propertyId = 0;
 
     private void OnDrawGizmos()
     {
@@ -32,6 +39,19 @@ public class PuzzleElement : MonoBehaviour
     //{
     //    meshFilter.mesh.uv = GetUV();
     //}
+
+    public void Outline(bool active)
+    {
+        MaterialPropertyBlock mpb = new MaterialPropertyBlock();
+
+        meshRenderer.GetPropertyBlock(mpb);
+
+        int value = active ? 1 : 0;
+
+        mpb.SetInt(propertyId, value);
+
+        meshRenderer.SetPropertyBlock(mpb);
+    }
 
     public void Init(Vector3 position, Vector3 randomPos, float size, BackgroundElement background)
     {
@@ -87,6 +107,8 @@ public class PuzzleElement : MonoBehaviour
         mesh.SetUVs(1, GetDefaultUV());
 
         meshFilter.mesh = mesh;
+
+        propertyId = Shader.PropertyToID(outlinePropertyName);
     }
 
     private Vector3 GetPosition(int x, int y)

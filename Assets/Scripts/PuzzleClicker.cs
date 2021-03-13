@@ -36,22 +36,36 @@ public class PuzzleClicker : MonoBehaviour
             {
                 if (selectedPuzzle)
                 {
-                    var pos = selectedPuzzle.transform.position;
-                    selectedPuzzle.transform.position = puzzle.transform.position;
-                    puzzle.transform.position = pos;
+                    if (selectedPuzzle != puzzle)
+                    {
+                        var pos = selectedPuzzle.transform.position;
+                        selectedPuzzle.transform.position = puzzle.transform.position;
+                        puzzle.transform.position = pos;
+                    }
+                    else
+                    {
+                        Debug.Log("clicked same");
+                    }
 
-                    selectedPuzzle = null;
+                    Deselect();
                 }
                 else
                 {
                     selectedPuzzle = puzzle;
+                    selectedPuzzle.Outline(true);
                 }
             }
-            else
-            {
-                selectedPuzzle = null;
-            }
         }
+        else
+        {
+            Deselect();
+        }
+    }
+
+    private void Deselect()
+    {
+        selectedPuzzle?.Outline(false);
+        selectedPuzzle = null;
     }
 
     private void OnDrawGizmos()
