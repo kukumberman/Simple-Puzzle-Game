@@ -43,6 +43,8 @@ public class PuzzleElement : MonoBehaviour
 
     public void Outline(bool active)
     {
+        //if (IsCorrectPosition()) return;
+
         MaterialPropertyBlock mpb = new MaterialPropertyBlock();
 
         meshRenderer.GetPropertyBlock(mpb);
@@ -52,6 +54,11 @@ public class PuzzleElement : MonoBehaviour
         mpb.SetInt(propertyId, value);
 
         meshRenderer.SetPropertyBlock(mpb);
+    }
+
+    public void DisableOutline()
+    {
+        // to do: remove white outline
     }
 
     public bool IsCorrectPosition()
@@ -113,6 +120,11 @@ public class PuzzleElement : MonoBehaviour
 
         gridCurrent = gridCurrentPosition;
         gridTarget = gridTargetPosition;
+
+        if (IsCorrectPosition())
+        {
+            DisableOutline();
+        }
 
         // mesh
 
