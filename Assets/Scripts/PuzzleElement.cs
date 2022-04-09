@@ -8,6 +8,9 @@ public class PuzzleElement : MonoBehaviour
     [SerializeField] private MeshFilter meshFilter = null;
     [SerializeField] private MeshRenderer meshRenderer = null;
 
+    [Header("Debug")]
+    [SerializeField] private bool m_DrawGizmo = true;
+
     private string gradientPropertyName = "_UseGradient";
     private string outlinePropertyName = "_UseOutline";
 
@@ -36,6 +39,11 @@ public class PuzzleElement : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        if (!m_DrawGizmo)
+        {
+            return;
+        }
+
         Color a = Color.blue;
         Color b = Color.red;
 

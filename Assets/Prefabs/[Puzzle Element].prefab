@@ -48,6 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   meshFilter: {fileID: 2276610022963105916}
   meshRenderer: {fileID: 4119733937989837661}
+  m_DrawGizmo: 0
 --- !u!33 &2276610022963105916
 MeshFilter:
   m_ObjectHideFlags: 0
