@@ -14,12 +14,15 @@
 		_Speed ("Speed", Int) = 2
 		_Alpha ("Alpha", Range(0, 1)) = 1
 		_Thickness ("Thickness", Range(0, 0.5)) = 0.2
+		_ColorA ("Color A", Color) = (1, 1, 1, 1)
+		_ColorB ("Color B", Color) = (0, 1, 0, 1)
     }
     SubShader
     {
         Tags 
 		{ 
 			"RenderType"="Opaque"
+			"PreviewType"="Plane"
 		}
 
 		Blend SrcAlpha OneMinusSrcAlpha
@@ -56,6 +59,9 @@
 			float _Alpha;
 			float _Thickness;
 
+			fixed4 _ColorA;
+			fixed4 _ColorB;
+
 			//float4 _Points[1];
 
 			fixed4 drawGrid(float2 uv)
@@ -88,6 +94,13 @@
                 return o;
             }
 
+			float rect(float thickess, float2 uv)
+			{
+				float2 bl = step(thickess, uv);
+				float2 tr = step(thickess, 1 - uv);
+				return bl.x * bl.y * tr.x * tr.y;
+			}
+
             fixed4 frag (v2f i) : SV_Target
             {
 				//float2 uv = i.uv * float2(3, 3);
@@ -96,11 +109,8 @@
 				// getting default uv
 				float2 uv = i._uv;
 
-				float2 bl = step(_Thickness, uv);
-				float2 tr = step(_Thickness, 1 - uv);
-
 				// borders are black, center is white
-				float value = bl.x * bl.y * tr.x * tr.y;
+				float value = rect(_Thickness, uv);
 
 				// dont draw black color (its needed if no texture)
 				//if (value == 0) discard;
@@ -114,25 +124,20 @@
 				// texture + outline
 				fixed4 color = tex + outline;
 
-				// to do: minor fix
-				/*if (_UseOutline > 0)
-				{
-					return color;
-				}
-				else
+				bool drawOutline = _UseOutline > 0;
+				if (!drawOutline)
 				{
 					return tex;
-				}*/
+				}
 
-				if (_UseGradient > 0)
+				bool drawGradient = _UseGradient > 0;
+				if (drawGradient)
 				{
 					// gradient calculations
 					float sinValue = sin(_Time.y * _Speed);
 					float percent01 = (sinValue + 1) / 2;
 
-					fixed4 a = fixed4(1, 1, 1, 1);
-					fixed4 b = fixed4(0, 1, 0, 1);
-					fixed4 gradientColor = lerp(a, b, percent01);
+					fixed4 gradientColor = lerp(_ColorA, _ColorB, percent01);
 
 					// texure + gradient outline
 					color = tex * value + outline * gradientColor;
